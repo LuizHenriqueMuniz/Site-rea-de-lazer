@@ -1,0 +1,656 @@
+import { useState, useEffect, useRef } from "react";
+import logoImg from "@/imports/logo_area.jpg";
+
+function useInView(threshold = 0.15) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setInView(true); },
+      { threshold }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return { ref, inView };
+}
+
+const GOLD = "#c9a84c";
+const GOLD_LIGHT = "#e8c97a";
+
+function GoldDivider() {
+  return (
+    <div className="flex items-center justify-center gap-4 my-2">
+      <div className="h-px flex-1 max-w-[80px]" style={{ background: `linear-gradient(to right, transparent, ${GOLD})` }} />
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+        <path d="M6 0L7.5 4.5H12L8.25 7.25L9.75 12L6 9L2.25 12L3.75 7.25L0 4.5H4.5L6 0Z" fill={GOLD} />
+      </svg>
+      <div className="h-px flex-1 max-w-[80px]" style={{ background: `linear-gradient(to left, transparent, ${GOLD})` }} />
+    </div>
+  );
+}
+
+function Nav() {
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  useEffect(() => {
+    const h = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", h);
+    return () => window.removeEventListener("scroll", h);
+  }, []);
+
+  const links = [
+    { label: "O Espaço", href: "#espaco" },
+    { label: "Comodidades", href: "#comodidades" },
+    { label: "Galeria", href: "#galeria" },
+    { label: "Localização", href: "#localizacao" },
+    { label: "Contato", href: "#contato" },
+  ];
+
+  return (
+    <nav
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
+      style={{
+        background: scrolled ? "rgba(10,10,10,0.95)" : "transparent",
+        backdropFilter: scrolled ? "blur(20px)" : "none",
+        borderBottom: scrolled ? `1px solid ${GOLD}22` : "none",
+      }}
+    >
+      <div className="max-w-6xl mx-auto px-6 flex items-center justify-between h-16">
+        <a href="#" className="flex items-center gap-3">
+          <img src={logoImg} alt="Espaço Andreluz" className="h-10 w-10 object-contain" />
+          <div className="hidden sm:block leading-tight">
+            <p className="font-display text-base font-semibold" style={{ color: GOLD, letterSpacing: "0.05em" }}>ESPAÇO</p>
+            <p className="font-display text-xs tracking-widest text-white/50 uppercase">Andreluz</p>
+          </div>
+        </a>
+
+        <div className="hidden md:flex items-center gap-8">
+          {links.map((l) => (
+            <a key={l.label} href={l.href}
+              className="text-[12px] font-medium tracking-widest uppercase text-white/60 hover:text-[#c9a84c] transition-colors duration-200">
+              {l.label}
+            </a>
+          ))}
+        </div>
+
+        <a href="#contato"
+          className="hidden md:inline-flex items-center gap-2 border text-[12px] font-semibold tracking-widest uppercase px-5 py-2.5 transition-all duration-200 hover:bg-[#c9a84c] hover:text-black"
+          style={{ borderColor: GOLD, color: GOLD }}>
+          Reservar
+        </a>
+
+        <button className="md:hidden p-2" onClick={() => setMobileOpen(!mobileOpen)}>
+          <div className="w-6 flex flex-col gap-1.5">
+            <span className={`block h-px transition-all ${mobileOpen ? "rotate-45 translate-y-2" : ""}`} style={{ background: GOLD }} />
+            <span className={`block h-px transition-all ${mobileOpen ? "opacity-0" : ""}`} style={{ background: GOLD }} />
+            <span className={`block h-px transition-all ${mobileOpen ? "-rotate-45 -translate-y-2" : ""}`} style={{ background: GOLD }} />
+          </div>
+        </button>
+      </div>
+
+      {mobileOpen && (
+        <div className="md:hidden bg-[#0a0a0a]/98 border-t px-6 pb-8 pt-6 flex flex-col gap-5" style={{ borderColor: `${GOLD}22` }}>
+          {links.map((l) => (
+            <a key={l.label} href={l.href} onClick={() => setMobileOpen(false)}
+              className="text-[13px] font-medium tracking-widest uppercase text-white/60">{l.label}</a>
+          ))}
+          <a href="#contato"
+            className="mt-2 text-center border text-[12px] font-semibold tracking-widest uppercase py-3 transition-colors"
+            style={{ borderColor: GOLD, color: GOLD }}>
+            Reservar
+          </a>
+        </div>
+      )}
+    </nav>
+  );
+}
+
+function Hero() {
+  const { ref, inView } = useInView(0.05);
+  return (
+    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden" style={{ background: "#0a0a0a" }}>
+      <div className="absolute inset-0">
+        <img
+          src="https://images.unsplash.com/photo-1651376589881-0e5a7eb15ae4?w=1600&h=900&fit=crop&auto=format"
+          alt="Piscina do Espaço Andreluz"
+          className="w-full h-full object-cover opacity-30"
+        />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, #0a0a0a 0%, transparent 30%, transparent 60%, #0a0a0a 100%)" }} />
+        <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 70% 60% at 50% 50%, ${GOLD}08 0%, transparent 70%)` }} />
+      </div>
+
+      <div
+        ref={ref}
+        className="relative z-10 text-center max-w-4xl mx-auto px-6 flex flex-col items-center"
+        style={{
+          opacity: inView ? 1 : 0,
+          transform: inView ? "translateY(0)" : "translateY(32px)",
+          transition: "opacity 1s ease, transform 1s ease",
+        }}
+      >
+        <img src={logoImg} alt="Espaço Andreluz" className="w-36 h-36 object-contain mb-8 drop-shadow-2xl" />
+
+        <p className="text-[11px] font-medium tracking-[0.4em] uppercase mb-6" style={{ color: GOLD }}>
+          Área de Lazer Exclusiva
+        </p>
+
+        <h1
+          className="font-display font-light text-white mb-6"
+          style={{ fontSize: "clamp(3rem, 8vw, 6rem)", letterSpacing: "-0.01em", lineHeight: 1.05 }}
+        >
+          Momentos que<br />
+          <em style={{ color: GOLD, fontStyle: "italic" }}>ficam para sempre</em>
+        </h1>
+
+        <GoldDivider />
+
+        <p className="text-white/60 text-base md:text-lg max-w-lg mx-auto leading-relaxed mt-6 mb-10 font-light">
+          Um refúgio completo para celebrar, descansar e criar memórias com quem você ama.
+        </p>
+
+        <div className="flex flex-col sm:flex-row items-center gap-4">
+          <a href="#contato"
+            className="px-8 py-3.5 text-[12px] font-semibold tracking-widest uppercase transition-all duration-200 hover:scale-105 active:scale-95"
+            style={{ background: GOLD, color: "#0a0a0a" }}>
+            Verificar Disponibilidade
+          </a>
+          <a href="#espaco"
+            className="flex items-center gap-2 text-[12px] font-medium tracking-widest uppercase transition-colors duration-200 hover:opacity-80"
+            style={{ color: GOLD }}>
+            Conhecer o espaço
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2 7h10M7 3l4 4-4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce" style={{ color: `${GOLD}60` }}>
+        <span className="text-[10px] tracking-widest uppercase">Scroll</span>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+        </svg>
+      </div>
+    </section>
+  );
+}
+
+function About() {
+  const { ref, inView } = useInView(0.1);
+  return (
+    <section id="espaco" className="py-28 px-6" style={{ background: "#0f0e0c" }}>
+      <div className="max-w-5xl mx-auto">
+        <div
+          ref={ref}
+          className="grid md:grid-cols-2 gap-16 items-center"
+          style={{
+            opacity: inView ? 1 : 0,
+            transform: inView ? "translateY(0)" : "translateY(28px)",
+            transition: "opacity 0.9s ease, transform 0.9s ease",
+          }}
+        >
+          <div>
+            <p className="text-[11px] font-medium tracking-[0.4em] uppercase mb-4" style={{ color: GOLD }}>O Espaço</p>
+            <h2 className="font-display font-light text-white mb-4" style={{ fontSize: "clamp(2rem, 5vw, 3.2rem)", lineHeight: 1.1 }}>
+              Um lugar feito para<br /><em style={{ color: GOLD }}>celebrar</em>
+            </h2>
+            <GoldDivider />
+            <p className="text-white/55 leading-relaxed mt-6 mb-5 font-light">
+              O Espaço Andreluz foi pensado em cada detalhe para proporcionar uma experiência única de lazer e confraternização. Com ótima localização, fácil acesso e estrutura completa, é o lugar perfeito para reunir família e amigos.
+            </p>
+            <p className="text-white/55 leading-relaxed font-light">
+              Ideal para aniversários, casamentos, confraternizações, chás de bebê e qualquer ocasião especial que mereça um espaço à altura da memória que você quer criar.
+            </p>
+            <div className="mt-8 grid grid-cols-2 gap-4">
+              {[
+                { n: "2", label: "Quartos" },
+                { n: "2", label: "Banheiros" },
+                { n: "1", label: "Piscina" },
+                { n: "1", label: "Espaço Gourmet" },
+              ].map((s) => (
+                <div key={s.label} className="border p-4" style={{ borderColor: `${GOLD}30` }}>
+                  <p className="font-display font-semibold text-3xl" style={{ color: GOLD }}>{s.n}</p>
+                  <p className="text-[12px] tracking-widest uppercase text-white/40 mt-1">{s.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="relative">
+            <img
+              src="https://images.unsplash.com/photo-1757924330358-a48d65664dac?w=700&h=900&fit=crop&auto=format"
+              alt="Piscina ao pôr do sol"
+              className="w-full object-cover"
+              style={{ height: 480 }}
+            />
+            <div className="absolute -bottom-4 -left-4 w-28 h-28 border-b border-l" style={{ borderColor: GOLD }} />
+            <div className="absolute -top-4 -right-4 w-28 h-28 border-t border-r" style={{ borderColor: GOLD }} />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const AMENITIES = [
+  {
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <path d="M4 18C4 12 8 8 14 8C20 8 24 12 24 18" stroke={GOLD} strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M2 20h24" stroke={GOLD} strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M4 22v2M24 22v2" stroke={GOLD} strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M10 8V6M14 8V4M18 8V6" stroke={GOLD} strokeWidth="1.2" strokeLinecap="round" />
+      </svg>
+    ),
+    title: "Piscina",
+    desc: "Piscina espaçosa com área de lazer ao redor, perfeita para relaxar e se refrescar em dias quentes.",
+  },
+  {
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <rect x="4" y="14" width="20" height="10" rx="1" stroke={GOLD} strokeWidth="1.5" />
+        <path d="M8 14V10a6 6 0 0112 0v4" stroke={GOLD} strokeWidth="1.5" />
+        <path d="M10 20h8M14 17v6" stroke={GOLD} strokeWidth="1.2" strokeLinecap="round" />
+        <circle cx="14" cy="6" r="2" stroke={GOLD} strokeWidth="1.2" />
+      </svg>
+    ),
+    title: "Espaço Gourmet Completo",
+    desc: "Cozinha equipada, churrasqueira, bancadas e tudo que você precisa para preparar refeições memoráveis.",
+  },
+  {
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <rect x="4" y="8" width="20" height="16" rx="1" stroke={GOLD} strokeWidth="1.5" />
+        <path d="M9 8V6a5 5 0 0110 0v2" stroke={GOLD} strokeWidth="1.5" />
+        <path d="M4 13h20" stroke={GOLD} strokeWidth="1.2" />
+        <rect x="11" y="16" width="6" height="5" rx="0.5" stroke={GOLD} strokeWidth="1.2" />
+      </svg>
+    ),
+    title: "2 Quartos",
+    desc: "Dois quartos confortáveis e bem decorados, ideais para hóspedes que queiram pernoitar.",
+  },
+  {
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <path d="M6 24V10a2 2 0 012-2h4v16" stroke={GOLD} strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M12 24V6h8a2 2 0 012 2v16" stroke={GOLD} strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M4 24h20" stroke={GOLD} strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M15 12h3M15 16h3" stroke={GOLD} strokeWidth="1.2" strokeLinecap="round" />
+      </svg>
+    ),
+    title: "2 Banheiros",
+    desc: "Dois banheiros modernos e espaçosos para o conforto de todos os convidados.",
+  },
+  {
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="9" stroke={GOLD} strokeWidth="1.5" />
+        <path d="M14 8v6l4 3" stroke={GOLD} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M5 5l1.5 1.5M22 5l-1.5 1.5" stroke={GOLD} strokeWidth="1.2" strokeLinecap="round" />
+      </svg>
+    ),
+    title: "Ótima Localização",
+    desc: "Endereço privilegiado com fácil acesso, próximo a vias principais e pontos de referência.",
+  },
+  {
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <path d="M14 4L5 9v10l9 5 9-5V9L14 4z" stroke={GOLD} strokeWidth="1.5" strokeLinejoin="round" />
+        <path d="M14 4v20M5 9l9 5 9-5" stroke={GOLD} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+    title: "Área Completa para Eventos",
+    desc: "Espaço amplo para decoração, mesas, palco ou pista de dança — organize do seu jeito.",
+  },
+];
+
+function Amenities() {
+  const { ref, inView } = useInView(0.05);
+  return (
+    <section id="comodidades" className="py-28 px-6" style={{ background: "#0a0a0a" }}>
+      <div className="max-w-6xl mx-auto">
+        <div
+          ref={ref}
+          className="text-center mb-16"
+          style={{
+            opacity: inView ? 1 : 0,
+            transform: inView ? "translateY(0)" : "translateY(24px)",
+            transition: "opacity 0.8s ease, transform 0.8s ease",
+          }}
+        >
+          <p className="text-[11px] font-medium tracking-[0.4em] uppercase mb-4" style={{ color: GOLD }}>Comodidades</p>
+          <h2 className="font-display font-light text-white" style={{ fontSize: "clamp(2rem, 5vw, 3.2rem)", lineHeight: 1.1 }}>
+            Tudo para a perfeita<br /><em style={{ color: GOLD }}>experiência</em>
+          </h2>
+          <GoldDivider />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px" style={{ background: `${GOLD}18` }}>
+          {AMENITIES.map((a, i) => (
+            <AmenityCard key={a.title} a={a} delay={i * 0.07} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function AmenityCard({ a, delay }: { a: typeof AMENITIES[0]; delay: number }) {
+  const { ref, inView } = useInView(0.2);
+  return (
+    <div
+      ref={ref}
+      className="p-8 flex flex-col gap-4 group hover:cursor-default transition-all duration-300"
+      style={{
+        background: "#0a0a0a",
+        opacity: inView ? 1 : 0,
+        transform: inView ? "translateY(0)" : "translateY(20px)",
+        transition: `opacity 0.6s ease ${delay}s, transform 0.6s ease ${delay}s, background 0.3s`,
+      }}
+      onMouseEnter={e => (e.currentTarget.style.background = "#141209")}
+      onMouseLeave={e => (e.currentTarget.style.background = "#0a0a0a")}
+    >
+      <div>{a.icon}</div>
+      <h3 className="font-display font-medium text-white text-xl">{a.title}</h3>
+      <p className="text-white/45 text-[13px] leading-relaxed font-light">{a.desc}</p>
+    </div>
+  );
+}
+
+const GALLERY = [
+  {
+    src: "https://images.unsplash.com/photo-1651376589881-0e5a7eb15ae4?w=800&h=600&fit=crop&auto=format",
+    alt: "Piscina com área de lazer",
+    span: "md:col-span-2",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1755704282977-340323fa52df?w=600&h=600&fit=crop&auto=format",
+    alt: "Decoração para eventos",
+    span: "",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1770318724110-c9d426f2125e?w=600&h=600&fit=crop&auto=format",
+    alt: "Espaço gourmet com churrasqueira",
+    span: "",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1768776183877-e8f3dfc91f40?w=600&h=600&fit=crop&auto=format",
+    alt: "Mesas decoradas para festa ao ar livre",
+    span: "",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&h=500&fit=crop&auto=format",
+    alt: "Quarto confortável",
+    span: "md:col-span-2",
+  },
+];
+
+function Gallery() {
+  const { ref, inView } = useInView(0.05);
+  return (
+    <section id="galeria" className="py-28 px-6" style={{ background: "#0f0e0c" }}>
+      <div className="max-w-6xl mx-auto">
+        <div
+          ref={ref}
+          className="text-center mb-16"
+          style={{
+            opacity: inView ? 1 : 0,
+            transform: inView ? "translateY(0)" : "translateY(24px)",
+            transition: "opacity 0.8s ease, transform 0.8s ease",
+          }}
+        >
+          <p className="text-[11px] font-medium tracking-[0.4em] uppercase mb-4" style={{ color: GOLD }}>Galeria</p>
+          <h2 className="font-display font-light text-white" style={{ fontSize: "clamp(2rem, 5vw, 3.2rem)", lineHeight: 1.1 }}>
+            Veja nosso <em style={{ color: GOLD }}>espaço</em>
+          </h2>
+          <GoldDivider />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {GALLERY.map((g, i) => (
+            <GalleryItem key={i} g={g} delay={i * 0.08} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function GalleryItem({ g, delay }: { g: typeof GALLERY[0]; delay: number }) {
+  const { ref, inView } = useInView(0.15);
+  return (
+    <div
+      ref={ref}
+      className={`relative overflow-hidden group ${g.span}`}
+      style={{
+        opacity: inView ? 1 : 0,
+        transform: inView ? "scale(1)" : "scale(0.97)",
+        transition: `opacity 0.7s ease ${delay}s, transform 0.7s ease ${delay}s`,
+        height: 260,
+        background: "#141414",
+      }}
+    >
+      <img
+        src={g.src}
+        alt={g.alt}
+        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+      />
+      <div
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4"
+        style={{ background: "linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%)" }}
+      >
+        <p className="text-white/80 text-[12px] tracking-wide">{g.alt}</p>
+      </div>
+    </div>
+  );
+}
+
+function Location() {
+  const { ref, inView } = useInView(0.1);
+  return (
+    <section id="localizacao" className="py-28 px-6" style={{ background: "#0a0a0a" }}>
+      <div className="max-w-5xl mx-auto">
+        <div
+          ref={ref}
+          className="grid md:grid-cols-2 gap-16 items-center"
+          style={{
+            opacity: inView ? 1 : 0,
+            transform: inView ? "translateY(0)" : "translateY(24px)",
+            transition: "opacity 0.9s ease, transform 0.9s ease",
+          }}
+        >
+          <div>
+            <p className="text-[11px] font-medium tracking-[0.4em] uppercase mb-4" style={{ color: GOLD }}>Localização</p>
+            <h2 className="font-display font-light text-white mb-4" style={{ fontSize: "clamp(2rem, 5vw, 3.2rem)", lineHeight: 1.1 }}>
+              Onde estamos
+            </h2>
+            <GoldDivider />
+            <p className="text-white/55 leading-relaxed mt-6 mb-8 font-light">
+              O Espaço Andreluz conta com uma localização privilegiada, de fácil acesso por transporte próprio, próximo a vias principais e pontos de referência da região.
+            </p>
+
+            <div className="flex flex-col gap-4">
+              {[
+                { icon: "📍", text: "Endereço disponível mediante reserva" },
+                { icon: "🚗", text: "Amplo estacionamento gratuito" },
+                { icon: "🕐", text: "Disponível todos os dias, sujeito a reserva" },
+                { icon: "📞", text: "Atendimento via WhatsApp" },
+              ].map((i) => (
+                <div key={i.text} className="flex items-start gap-4 text-white/55 text-[14px] font-light">
+                  <span className="text-lg mt-0.5">{i.icon}</span>
+                  <span>{i.text}</span>
+                </div>
+              ))}
+            </div>
+
+            <a
+              href="#contato"
+              className="inline-flex items-center gap-2 mt-10 border text-[12px] font-semibold tracking-widest uppercase px-6 py-3 transition-all duration-200 hover:bg-[#c9a84c] hover:text-black"
+              style={{ borderColor: GOLD, color: GOLD }}
+            >
+              Solicitar endereço
+            </a>
+          </div>
+
+          <div className="relative">
+            <img
+              src="https://images.unsplash.com/photo-1757924330358-a48d65664dac?w=700&h=500&fit=crop&auto=format"
+              alt="Vista do espaço de lazer"
+              className="w-full object-cover"
+              style={{ height: 400 }}
+            />
+            <div className="absolute inset-0 border" style={{ borderColor: `${GOLD}30`, margin: "12px" }} />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Contact() {
+  const { ref, inView } = useInView(0.1);
+  const [form, setForm] = useState({ nome: "", telefone: "", data: "", evento: "", mensagem: "" });
+  const [sent, setSent] = useState(false);
+
+  const waMessage = encodeURIComponent(
+    `Olá! Gostaria de fazer uma reserva no Espaço Andreluz.\n\nNome: ${form.nome}\nData desejada: ${form.data}\nTipo de evento: ${form.evento}\nMensagem: ${form.mensagem}`
+  );
+
+  return (
+    <section id="contato" className="py-28 px-6" style={{ background: "#0f0e0c" }}>
+      <div className="max-w-4xl mx-auto">
+        <div
+          ref={ref}
+          className="text-center mb-16"
+          style={{
+            opacity: inView ? 1 : 0,
+            transform: inView ? "translateY(0)" : "translateY(24px)",
+            transition: "opacity 0.8s ease, transform 0.8s ease",
+          }}
+        >
+          <p className="text-[11px] font-medium tracking-[0.4em] uppercase mb-4" style={{ color: GOLD }}>Contato</p>
+          <h2 className="font-display font-light text-white" style={{ fontSize: "clamp(2rem, 5vw, 3.2rem)", lineHeight: 1.1 }}>
+            Faça sua <em style={{ color: GOLD }}>reserva</em>
+          </h2>
+          <GoldDivider />
+          <p className="text-white/45 mt-6 font-light max-w-md mx-auto">
+            Preencha o formulário abaixo e entraremos em contato para confirmar disponibilidade e condições.
+          </p>
+        </div>
+
+        {sent ? (
+          <div className="text-center py-16 border" style={{ borderColor: `${GOLD}30` }}>
+            <div className="text-4xl mb-4">✨</div>
+            <h3 className="font-display text-2xl text-white mb-2">Mensagem enviada!</h3>
+            <p className="text-white/50 font-light">Entraremos em contato em breve via WhatsApp.</p>
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 gap-10">
+            <div className="flex flex-col gap-4">
+              {[
+                { key: "nome", label: "Nome completo", type: "text", placeholder: "Seu nome" },
+                { key: "telefone", label: "WhatsApp", type: "tel", placeholder: "(00) 00000-0000" },
+                { key: "data", label: "Data do evento", type: "date", placeholder: "" },
+                { key: "evento", label: "Tipo de evento", type: "text", placeholder: "Ex: Aniversário, Casamento..." },
+              ].map((f) => (
+                <div key={f.key} className="flex flex-col gap-1.5">
+                  <label className="text-[11px] font-medium tracking-widest uppercase" style={{ color: GOLD }}>
+                    {f.label}
+                  </label>
+                  <input
+                    type={f.type}
+                    placeholder={f.placeholder}
+                    value={form[f.key as keyof typeof form]}
+                    onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
+                    className="bg-transparent border px-4 py-3 text-white text-[14px] outline-none transition-colors focus:border-[#c9a84c] placeholder:text-white/20"
+                    style={{ borderColor: `${GOLD}30`, colorScheme: "dark" }}
+                  />
+                </div>
+              ))}
+            </div>
+
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5 flex-1">
+                <label className="text-[11px] font-medium tracking-widest uppercase" style={{ color: GOLD }}>
+                  Mensagem
+                </label>
+                <textarea
+                  rows={6}
+                  placeholder="Conte mais sobre o seu evento, número de convidados, necessidades especiais..."
+                  value={form.mensagem}
+                  onChange={e => setForm(p => ({ ...p, mensagem: e.target.value }))}
+                  className="bg-transparent border px-4 py-3 text-white text-[14px] outline-none transition-colors focus:border-[#c9a84c] placeholder:text-white/20 resize-none flex-1"
+                  style={{ borderColor: `${GOLD}30` }}
+                />
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <a
+                  href={`https://wa.me/55?text=${waMessage}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-3 py-4 text-[12px] font-semibold tracking-widest uppercase transition-all duration-200 hover:opacity-90 active:scale-95"
+                  style={{ background: GOLD, color: "#0a0a0a" }}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+                  </svg>
+                  Enviar via WhatsApp
+                </a>
+                <button
+                  onClick={() => setSent(true)}
+                  className="py-4 text-[12px] font-semibold tracking-widest uppercase border transition-all duration-200 hover:bg-white/5"
+                  style={{ borderColor: `${GOLD}40`, color: GOLD }}
+                >
+                  Só enviar mensagem
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="py-12 px-6 border-t" style={{ background: "#0a0a0a", borderColor: `${GOLD}18` }}>
+      <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="flex items-center gap-3">
+          <img src={logoImg} alt="Espaço Andreluz" className="h-12 w-12 object-contain" />
+          <div>
+            <p className="font-display text-base font-semibold" style={{ color: GOLD }}>ESPAÇO ANDRELUZ</p>
+            <p className="text-[11px] tracking-widest uppercase text-white/30">Área de Lazer</p>
+          </div>
+        </div>
+
+        <div className="flex flex-col md:flex-row items-center gap-6 text-[12px] tracking-widest uppercase text-white/30">
+          {["O Espaço", "Comodidades", "Galeria", "Contato"].map((l) => (
+            <a key={l} href={`#${l.toLowerCase().replace(" ", "")}`} className="hover:text-[#c9a84c] transition-colors">{l}</a>
+          ))}
+        </div>
+
+        <p className="text-[11px] text-white/20 tracking-wide">© 2026 Espaço Andreluz</p>
+      </div>
+    </footer>
+  );
+}
+
+export default function App() {
+  return (
+    <div className="min-h-screen" style={{ fontFamily: "var(--font-sans)" }}>
+      <Nav />
+      <Hero />
+      <About />
+      <Amenities />
+      <Gallery />
+      <Location />
+      <Contact />
+      <Footer />
+    </div>
+  );
+}
