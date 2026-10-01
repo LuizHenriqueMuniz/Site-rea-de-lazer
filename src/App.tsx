@@ -114,10 +114,10 @@ function Hero() {
     <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden" style={{ background: "#0a0a0a" }}>
       <div className="absolute inset-0">
         <img
-          src="https://images.unsplash.com/photo-1651376589881-0e5a7eb15ae4?w=1600&h=900&fit=crop&auto=format"
-          alt="Piscina do Espaço Andreluz"
-          className="w-full h-full object-cover opacity-30"
-        />
+  src="/images/frente recortada.webp"
+  alt="Dentro do Espaço Andreluz"
+  className="w-full h-full object-cover"
+/>
         <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, #0a0a0a 0%, transparent 30%, transparent 60%, #0a0a0a 100%)" }} />
         <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 70% 60% at 50% 50%, ${GOLD}08 0%, transparent 70%)` }} />
       </div>
@@ -221,11 +221,10 @@ function About() {
 
           <div className="relative">
             <img
-              src="https://images.unsplash.com/photo-1757924330358-a48d65664dac?w=700&h=900&fit=crop&auto=format"
-              alt="Piscina ao pôr do sol"
-              className="w-full object-cover"
-              style={{ height: 480 }}
-            />
+  src="/images/dentro.webp"
+  alt="Dentro do Espaço Andreluz"
+  className="w-full h-full object-cover opacity-30"
+/>
             <div className="absolute -bottom-4 -left-4 w-28 h-28 border-b border-l" style={{ borderColor: GOLD }} />
             <div className="absolute -top-4 -right-4 w-28 h-28 border-t border-r" style={{ borderColor: GOLD }} />
           </div>
@@ -362,28 +361,28 @@ function AmenityCard({ a, delay }: { a: typeof AMENITIES[0]; delay: number }) {
 
 const GALLERY = [
   {
-    src: "https://images.unsplash.com/photo-1651376589881-0e5a7eb15ae4?w=800&h=600&fit=crop&auto=format",
-    alt: "Piscina com área de lazer",
+    src: "/images/banheiros.webp",
+    alt: "banheros do espaço andreluz",
     span: "md:col-span-2",
   },
   {
-    src: "https://images.unsplash.com/photo-1755704282977-340323fa52df?w=600&h=600&fit=crop&auto=format",
-    alt: "Decoração para eventos",
+    src: "/images/piscina.webp",
+    alt: "Piscina do espaço andreluz",
     span: "",
   },
   {
-    src: "https://images.unsplash.com/photo-1770318724110-c9d426f2125e?w=600&h=600&fit=crop&auto=format",
+    src: "/images/gourmet.webp",
     alt: "Espaço gourmet com churrasqueira",
     span: "",
   },
   {
-    src: "https://images.unsplash.com/photo-1768776183877-e8f3dfc91f40?w=600&h=600&fit=crop&auto=format",
-    alt: "Mesas decoradas para festa ao ar livre",
+    src: "/images/quarto1.webp",
+    alt: "Quarto com duas camas e ar-condicionado",
     span: "",
   },
   {
-    src: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&h=500&fit=crop&auto=format",
-    alt: "Quarto confortável",
+    src: "/images/quarto2.webp",
+    alt: "Quarto com beliche e ar-condicionado",
     span: "md:col-span-2",
   },
 ];
@@ -497,11 +496,10 @@ function Location() {
 
           <div className="relative">
             <img
-              src="https://images.unsplash.com/photo-1757924330358-a48d65664dac?w=700&h=500&fit=crop&auto=format"
-              alt="Vista do espaço de lazer"
-              className="w-full object-cover"
-              style={{ height: 400 }}
-            />
+  src="/images/piscina.webp"
+  alt="Piscina do Espaço Andreluz"
+  className="w-full h-full object-cover opacity-30"
+/>
             <div className="absolute inset-0 border" style={{ borderColor: `${GOLD}30`, margin: "12px" }} />
           </div>
         </div>
