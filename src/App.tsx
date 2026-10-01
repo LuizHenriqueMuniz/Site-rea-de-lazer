@@ -550,9 +550,7 @@ function Lightbox({
       </button>
     </div>
   );
-}git add .
-git commit -m "Adiciona ampliação de fotos na galeria"
-git push
+}
 
 function Location() {
   const { ref, inView } = useInView(0.1);
