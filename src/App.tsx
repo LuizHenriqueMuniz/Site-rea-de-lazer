@@ -369,6 +369,8 @@ const GALLERY = [
 
 function Gallery() {
   const { ref, inView } = useInView(0.05);
+  const [aberta, setAberta] = useState<number | null>(null);
+
   return (
     <section id="galeria" className="py-28 px-6" style={{ background: "#0f0e0c" }}>
       <div className="max-w-6xl mx-auto">
@@ -390,20 +392,34 @@ function Gallery() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {GALLERY.map((g, i) => (
-            <GalleryItem key={i} g={g} delay={i * 0.08} />
+            <GalleryItem key={i} g={g} delay={i * 0.08} onOpen={() => setAberta(i)} />
           ))}
         </div>
       </div>
+
+      {aberta !== null && (
+        <Lightbox index={aberta} onClose={() => setAberta(null)} onChange={setAberta} />
+      )}
     </section>
   );
 }
 
-function GalleryItem({ g, delay }: { g: typeof GALLERY[0]; delay: number }) {
+function GalleryItem({ g, delay, onOpen }: { g: typeof GALLERY[0]; delay: number; onOpen: () => void }) {
   const { ref, inView } = useInView(0.15);
   return (
     <div
       ref={ref}
-      className={`relative overflow-hidden group ${g.span}`}
+      role="button"
+      tabIndex={0}
+      aria-label={`Ampliar foto: ${g.alt}`}
+      onClick={onOpen}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onOpen();
+        }
+      }}
+      className={`relative overflow-hidden group cursor-zoom-in ${g.span}`}
       style={{
         opacity: inView ? 1 : 0,
         transform: inView ? "scale(1)" : "scale(0.97)",
@@ -415,6 +431,7 @@ function GalleryItem({ g, delay }: { g: typeof GALLERY[0]; delay: number }) {
       <img
         src={g.src}
         alt={g.alt}
+        loading="lazy"
         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
       />
       <div
@@ -426,6 +443,116 @@ function GalleryItem({ g, delay }: { g: typeof GALLERY[0]; delay: number }) {
     </div>
   );
 }
+
+function Lightbox({
+  index,
+  onClose,
+  onChange,
+}: {
+  index: number;
+  onClose: () => void;
+  onChange: (i: number) => void;
+}) {
+  const total = GALLERY.length;
+  const g = GALLERY[index];
+  const touchX = useRef<number | null>(null);
+
+  const anterior = () => onChange((index - 1 + total) % total);
+  const proxima = () => onChange((index + 1) % total);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+      if (e.key === "ArrowLeft") anterior();
+      if (e.key === "ArrowRight") proxima();
+    };
+    window.addEventListener("keydown", onKey);
+    const overflowOriginal = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = overflowOriginal;
+    };
+  }, [index]);
+
+  const botaoBase =
+    "absolute flex h-11 w-11 items-center justify-center rounded-full border transition-colors hover:bg-[#c9a84c] hover:text-black";
+  const botaoStyle = { borderColor: `${GOLD}60`, color: GOLD, background: "rgba(10,10,10,0.6)" };
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={g.alt}
+      className="fixed inset-0 z-[60] flex items-center justify-center"
+      style={{ background: "rgba(0,0,0,0.92)" }}
+      onClick={onClose}
+      onTouchStart={(e) => {
+        touchX.current = e.touches[0].clientX;
+      }}
+      onTouchEnd={(e) => {
+        if (touchX.current === null) return;
+        const dx = e.changedTouches[0].clientX - touchX.current;
+        touchX.current = null;
+        if (Math.abs(dx) > 50) {
+          if (dx > 0) anterior();
+          else proxima();
+        }
+      }}
+    >
+      <button
+        type="button"
+        aria-label="Fechar"
+        onClick={onClose}
+        className={`${botaoBase} top-4 right-4`}
+        style={botaoStyle}
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+      </button>
+
+      <button
+        type="button"
+        aria-label="Foto anterior"
+        onClick={(e) => {
+          e.stopPropagation();
+          anterior();
+        }}
+        className={`${botaoBase} left-3 top-1/2 -translate-y-1/2`}
+        style={botaoStyle}
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+
+      <figure className="w-full max-w-5xl px-16" onClick={(e) => e.stopPropagation()}>
+        <img src={g.src} alt={g.alt} className="mx-auto max-h-[80vh] w-full object-contain" />
+        <figcaption className="mt-3 text-center text-[13px] text-white/70">
+          {g.alt} · {index + 1}/{total}
+        </figcaption>
+      </figure>
+
+      <button
+        type="button"
+        aria-label="Próxima foto"
+        onClick={(e) => {
+          e.stopPropagation();
+          proxima();
+        }}
+        className={`${botaoBase} right-3 top-1/2 -translate-y-1/2`}
+        style={botaoStyle}
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+    </div>
+  );
+}git add .
+git commit -m "Adiciona ampliação de fotos na galeria"
+git push
 
 function Location() {
   const { ref, inView } = useInView(0.1);
