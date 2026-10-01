@@ -522,6 +522,7 @@ function Contact() {
     }
     if (!form.data) return "Escolha a data do evento.";
     if (form.data < hoje) return "A data do evento não pode ser no passado.";
+    if (form.evento.trim().length < 2) return "Informe o tipo de evento.";
     return "";
   }
 
@@ -532,7 +533,7 @@ function Contact() {
       `*Nome:* ${form.nome.trim()}`,
       `*WhatsApp:* ${form.telefone}`,
       `*Data do evento:* ${dataBR(form.data)}`,
-      `*Tipo de evento:* ${form.evento.trim() || "-"}`,
+      `*Tipo de evento:* ${form.evento.trim()}`,
       `*Mensagem:* ${form.mensagem.trim() || "-"}`,
     ].join("\n");
   }
