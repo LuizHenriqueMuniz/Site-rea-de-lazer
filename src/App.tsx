@@ -613,7 +613,7 @@ function Location() {
   );
 }
 
-const WHATSAPP_NUMBER = "5517991768248"; // 55 + DDD + número, só dígitos. Ex.: "5517999998888"
+const WHATSAPP_NUMBER = "5517991127921"; // 55 + DDD + número, só dígitos. Ex.: "5517999998888"
 const ENVIO_POR_EMAIL_ATIVO = false; // vire true quando o backend /api/reserva existir
 
 function formatarTelefone(valor: string) {
